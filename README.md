@@ -1,7 +1,15 @@
 # twitter-mimic-bot
 
+first run:
+
 ```
 ./bootstrap.sh
+```
+
+before working:
+
+```
+. activate.sh
 ```
 
 ```
