@@ -4,3 +4,4 @@ MarkovText
 nose-parameterized
 pyparsing
 twitter
+emoji_list

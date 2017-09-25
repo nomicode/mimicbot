@@ -1,4 +1,5 @@
 import re
+import random
 
 class Processor:
 
@@ -13,7 +14,7 @@ class Processor:
         # chop leading spaces
         text = re.sub("^ +", "", text)
         # chop trailing spaces
-        text = re.sub("^ +", "", text)
+        text = re.sub(" +$", "", text)
         return text
 
     def trim_trailing_full_stop(self, text):

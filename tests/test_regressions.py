@@ -10,7 +10,7 @@ class TestRegressions(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TestRegressions, self).__init__(*args, **kwargs)
-        self.bot = mimicbot.Bot()
+        self.bot = mimicbot.Bot("irlnomibot")
 
     @parameterized.expand([
         "picard “space"
