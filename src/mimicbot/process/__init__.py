@@ -38,7 +38,7 @@ class Processor:
         return text
 
     def run(self, text):
-        text = self.correct_case(text)
+        # text = self.correct_case(text)
         text = self.trim_spaces(text)
         text = self.trim_trailing_full_stop(text)
         text = self.replace_curly_quotes(text)
