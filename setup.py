@@ -34,6 +34,7 @@ setuptools.setup(
     entry_points = {
         "console_scripts": ["mimicbot=mimicbot.cli:main"],
     },
+    test_suite="nose2.collector.collector",
     install_requires=[
       "setuptools",
     ]

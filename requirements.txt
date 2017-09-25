@@ -1,1 +1,4 @@
 nose2
+language_check
+MarkovText
+nose-parameterized

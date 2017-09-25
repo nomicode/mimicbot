@@ -12,9 +12,13 @@ before working:
 . activate.sh
 ```
 
+to develop:
+
 ```
-python3 setup.py install
+python3 setup.py develop
 ```
+
+to run:
 
 ```
 mimicbot
