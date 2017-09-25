@@ -3,3 +3,4 @@ language_check
 MarkovText
 nose-parameterized
 pyparsing
+twitter
