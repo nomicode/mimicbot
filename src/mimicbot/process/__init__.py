@@ -18,7 +18,8 @@ class Processor:
 
     def trim_trailing_full_stop(self, text):
         # drop trailing full stops
-        text = re.sub("\.$", "", text)
+        # but not if there's more than one full stop
+        text = re.sub("[^.]\.$", "", text)
         return text
 
     def replace_curly_quotes(self, text):
