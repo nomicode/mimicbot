@@ -71,3 +71,11 @@ ALL FUNCTIONS MUST HAVE UNIT TESTS
 ALL OPERATIONS SPLIT INTO LOGICAL FUNCTIONS
 
 ALL FUNCTIONS MUST HAVE UNIT TESTS
+
+## Interactivity
+
+- should run on the minute every minute (or some such)
+- checks for replies. replies to them
+- posts intermittently
+- owner can dm it. give it a search term, to prompt a tweet
+- possible let you direct it so it @s someone
