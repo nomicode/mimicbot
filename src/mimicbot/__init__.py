@@ -10,8 +10,8 @@ class Bot:
 
     processor = None
 
-    def __init__(self):
-        self.generator = generate.Generator()
+    def __init__(self, name):
+        self.generator = generate.Generator(name)
         self.filter = filter.Filter()
         self.processor = process.Processor()
 

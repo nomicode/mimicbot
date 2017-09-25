@@ -8,9 +8,9 @@ class MarkovGenerator:
 
     chain = None
 
-    def __init__(self):
+    def __init__(self, name):
         self.chain = MarkovText.Markov()
-        filename = os.path.expanduser("~/.mimicbot/irlnomi/tweets.txt")
+        filename = os.path.expanduser("~/.mimicbot/%s/tweets.txt" % name)
         self.chain.add_to_dict(open(filename).read())
 
     def run(self):

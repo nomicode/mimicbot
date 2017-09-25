@@ -4,13 +4,13 @@ import mimicbot
 from mimicbot import twitter
 
 def main(*args):
-    bot = mimicbot.Bot()
+    name = sys.argv[1]
+    bot = mimicbot.Bot(name)
     text = bot.get_text()
     print("finished\n")
     print(text)
     try:
-        name = sys.argv[1]
-        print(name)
+        post = sys.argv[2]
         client = twitter.Client(name)
         client.post(text)
     except IndexError:
