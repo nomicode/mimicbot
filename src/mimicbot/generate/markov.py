@@ -1,3 +1,4 @@
+import os.path
 import random
 import re
 
@@ -9,7 +10,8 @@ class MarkovGenerator:
 
     def __init__(self):
         self.chain = MarkovText.Markov()
-        self.chain.add_to_dict(open("tweets.txt").read())
+        filename = os.path.expanduser("~/.mimicbot/irlnomi/tweets.txt" % name)
+        self.chain.add_to_dict(open(filename).read())
 
     def run(self):
         sentence_count = random.randint(1, 6)
