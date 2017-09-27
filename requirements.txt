@@ -5,3 +5,5 @@ nose-parameterized
 pyparsing
 twitter
 emoji_list
+wheel
+twine
