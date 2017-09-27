@@ -37,5 +37,8 @@ setuptools.setup(
     test_suite="nose2.collector.collector",
     install_requires=[
       "setuptools",
+      "MarkovText",
+      "twitter",
+      "pyparsing",
     ]
 )
