@@ -30,7 +30,7 @@ setuptools.setup(
     url="https://github.com/nslater/mimicbot",
     keywords="twitter bot",
     license="Apache License 2.0",
-    packages=find_packages("src"),
+    packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
     entry_points = {
         "console_scripts": ["mimicbot=mimicbot.cli:main"],
