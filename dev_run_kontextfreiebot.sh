@@ -6,4 +6,4 @@ cd `dirname $0`
 
 python3 setup.py develop
 
-mimicbot kontextfreiebot post
+mimicbot kontextfreiebot 30 post
