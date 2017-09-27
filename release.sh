@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-if git status -s > /dev/null; then
+if test -n "`git status -s`"; then
     echo "unsaved or unpushed changes"
     exit 1
 fi
