@@ -1,8 +1,8 @@
-#!/bin/sh -ex
+#!/bin/sh -e
 
 if git status -s > /dev/null; then
     echo "unsaved changes"
-    # exit 1
+    exit 1
 fi
 
 git fetch origin > /dev/null

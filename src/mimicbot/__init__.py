@@ -1,6 +1,6 @@
 from mimicbot import filter, generate, process
 
-__version__ = "0.0.0"
+__version__ = "0.0.2"
 
 class Bot:
 
