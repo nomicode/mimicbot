@@ -33,7 +33,7 @@ setuptools.setup(
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
     entry_points = {
-        "console_scripts": ["mimicbot=mimicbot.cli:main"],
+        "console_scripts": ["mimicbot=mimicbot.cli:cli"],
     },
     test_suite="nose2.collector.collector",
     install_requires=[
@@ -41,5 +41,6 @@ setuptools.setup(
       "MarkovText",
       "twitter",
       "pyparsing",
+      "click"
     ]
 )

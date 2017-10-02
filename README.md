@@ -15,6 +15,12 @@ before working:
 to develop:
 
 ```
+pip install --editable .
+```
+
+outdated:
+
+```
 python3 setup.py develop
 ```
 
