@@ -1,8 +1,12 @@
+import os
+
 from mimicbot import filter, generate, process
 
 __version__ = "0.0.6"
 
 class Bot:
+
+    dir = None
 
     generator = None
 
@@ -11,7 +15,11 @@ class Bot:
     processor = None
 
     def __init__(self, name):
-        self.generator = generate.Generator(name)
+        home = os.path.expanduser("~")
+        self.dir = os.path.join(home, ".mimicbot", name)
+        if not os.path.isdir(self.dir):
+            raise Exception("bot dir does not exist")
+        self.generator = generate.Generator(self.dir)
         self.filter = filter.Filter()
         self.processor = process.Processor()
 

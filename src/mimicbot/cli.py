@@ -4,8 +4,6 @@ import random
 import time
 import shutil
 
-from os.path import expanduser
-
 import click
 
 import mimicbot
@@ -19,7 +17,7 @@ def cli():
 @click.argument("bot_name")
 def create(bot_name):
     "Create a bot."
-    home = expanduser("~")
+    home = os.path.expanduser("~")
     bot_dir = os.path.join(home, ".mimicbot", bot_name)
     if not os.path.isdir(bot_dir):
         click.secho("Creating bot...", fg="green")
@@ -31,7 +29,7 @@ def create(bot_name):
 @cli.command()
 def list():
     "List bots."
-    home = expanduser("~")
+    home = os.path.expanduser("~")
     bots_dir = os.path.join(home, ".mimicbot")
     for filename in os.listdir(bots_dir):
         if os.path.isdir(os.path.join(bots_dir, filename)):
@@ -41,7 +39,7 @@ def list():
 @click.argument("bot_name")
 def delete(bot_name):
     "Delete a bot."
-    home = expanduser("~")
+    home = os.path.expanduser("~")
     bot_dir = os.path.join(home, ".mimicbot", bot_name)
     if os.path.isdir(bot_dir):
         click.secho("Deleting bot...", fg="green")
