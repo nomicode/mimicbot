@@ -13,6 +13,8 @@ from MarkovText import MarkovText
 from whoosh import fields, index, qparser, analysis, sorting
 import whoosh.query
 
+import click
+
 import pprint
 pp = pprint.PrettyPrinter(indent=4, depth=9)
 
@@ -77,7 +79,6 @@ class MarkovGenerator:
 
         from whoosh.qparser.dateparse import DateParserPlugin
 
-        print("running date query...")
         datetimes = sorting.FieldFacet("datetime", reverse=True)
         parser = qparser.QueryParser("text", self.index.schema)
         query = parser.parse("*")
@@ -88,24 +89,34 @@ class MarkovGenerator:
         results = searcher.search(
             query, mask=restrict_replies, sortedby=datetimes, limit=number)
 
-        self.context = ""
+        click.secho("Adding to context...", fg="green")
+
+        context = set()
+
         for result in results:
-            print("context add: %s" % result["text"])
-            self.context += result["text"]
+            text = result["text"]
 
-        print("combined context: %s" % self.context)
+            click.secho(text)
 
-        import re
+            import re
 
-        # don't want these influence context
-        # drop usernames
-        self.context = re.sub(r"@[^ ]+", " ", self.context)
-        # drop links
-        self.context = re.sub(r"http(s?)://[^ ]+", " ", self.context)
-        # drop cut-off text from the end of manual rts
-        self.context = re.sub(r"[^ ]+…$", " ", self.context)
+            # don't want these influence context
+            # drop usernames
+            text = re.sub(r"@[^ ]+", " ", text)
+            # drop links
+            text = re.sub(r"http(s?)://[^ ]+", " ", text)
+            # drop cut-off text from the end of manual rts
+            text = re.sub(r"[^ ]+…$", " ", text)
 
-        print("filtered context: %s" % self.context)
+            context.update(text.split(" "))
+
+        # split and discard empty strings
+        context = " ".join(filter(None, context))
+
+        click.secho("Processed context:", fg="green")
+        click.secho(context)
+
+        self.context = context
 
         return self.context
 
@@ -121,6 +132,8 @@ class MarkovGenerator:
                 reply = True if row[1] else False
                 retweet = True if row[6] else False
                 text = html.unescape(row[5])
+                # turn newlines into something a markov chain is aware of
+                text = re.sub(r"\n", " %NEWLINE% ", text)
                 yield id, datetime, reply, retweet, text
 
     def train_csv(self, filename):
@@ -143,6 +156,8 @@ class MarkovGenerator:
             reply = True if tweet["in_reply_to_status_id"] else False
             retweet = True if tweet["retweeted"] else False
             text = html.unescape(tweet["text"])
+            # turn newlines into something a markov chain is aware of
+            text = re.sub(r"\n", " %NEWLINE% ", text)
             print("writing doc: %s, %s, %s, %s, %s" % (id, datetime, reply, retweet, text))
             writer.update_document(id=id, datetime=datetime, reply=reply, retweet=retweet, text=text)
         writer.commit()
@@ -152,18 +167,22 @@ class MarkovGenerator:
     def run(self, use_context, manual_context):
         # TODO needs to progressively search if we're not turning up enough
         # results
-        print("run")
         context = ""
         if use_context:
+            click.secho("Searching for context tweets...", fg="green")
             context = self.get_context()
         if manual_context:
             context = manual_context
-        print("searching...")
-        results = list(self.search(context))
-        print("got %s results" % len(results))
+        click.secho("Getting tweets for markov chain...", fg="green")
+        results = list(self.search("%NEWLINE%"))
+        # BIG TODO: EXPAND CONTEXT SEARCH SO WE AIM FOR X RESULTS
+        # BIG TODO: (let's say 100)
+        click.secho("Got %s tweets!" % len(results), fg="green")
         self.chain = MarkovText.Markov()
         for result in results:
             self.chain.add_to_dict(result)
         sentence_count = random.randint(1, 6)
-        return self.chain.create_sentences(sentence_count)
+        output = self.chain.create_sentences(sentence_count)
+        output = re.sub(r"\s?%NEWLINE%\s?", "\n", output)
+        return output
 
