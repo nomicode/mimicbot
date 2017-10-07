@@ -8,6 +8,7 @@ class Client():
 
     def __init__(self, name):
         # load Twitter app consumer details
+        # TODO: move this to ini file
         consumer_file = os.path.expanduser("~/.mimicbot/%s/consumer" % name)
         consumer_key, consumer_secret = twitter.read_token_file(consumer_file)
 
