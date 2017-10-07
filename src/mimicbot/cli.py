@@ -12,20 +12,43 @@ def cli():
     pass
 
 @cli.command()
-@click.argument("name")
+@click.argument("bot_name")
+def create():
+    "Create a bot."
+    click.echo("create")
+
+@cli.command()
+@click.argument("bot_name")
+def list():
+    "List bots."
+    click.echo("list")
+
+@cli.command()
+@click.argument("bot_name")
+def delete():
+    "Delete a bot."
+    click.echo("delete")
+
+@cli.command()
+@click.argument("bot_name")
 def auth():
-    "Authenticate against Twitter."
-    click.echo("reset")
+    "Authenticate a bot against Twitter."
+    click.echo("auth")
 
 @cli.command()
+@click.argument("bot_name")
 def reset():
-    "Reset training."
+    "Reset a bot's training."
     click.echo("reset")
 
 @cli.command()
-def train():
-    "Train from source material."
-    click.echo("reset")
+@click.option("--csv-archive",
+    help="Train from Twitter CSV tweet archive.")
+@click.argument("bot_name")
+def train(bot_name, csv_archive):
+    "Train a bot from source material."
+    bot = mimicbot.Bot(bot_name)
+    bot.generator.train_csv(csv_archive)
 
 @cli.command()
 @click.option("--random-exit", default=0,
@@ -34,16 +57,16 @@ def train():
     help="Run with a random delay.")
 @click.option("--dry-run", is_flag=True,
     help="Dry run. Do not post.")
-@click.argument("name")
-def run(name, random_exit, random_delay, dry_run):
-    "Run the bot."
+@click.argument("bot_name")
+def run(bot_name, random_exit, random_delay, dry_run):
+    "Run a bot."
     if random_exit:
         roll = random.randint(1, random_exit)
         if roll != 1:
             click.secho("Randomly exiting!", fg="green")
             return
     click.secho("Getting text...", fg="green")
-    bot = mimicbot.Bot(name)
+    bot = mimicbot.Bot(bot_name)
     text = bot.get_text()
     click.secho("Got text...", fg="green")
     click.echo("%s" % text)

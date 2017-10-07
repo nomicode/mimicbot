@@ -8,3 +8,4 @@ emoji_list
 wheel
 twine
 click
+Whoosh
