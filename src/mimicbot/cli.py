@@ -50,8 +50,9 @@ def delete(bot_name):
 
 @cli.command()
 @click.argument("bot_name")
-def auth():
+def auth(bot_name):
     "Authenticate a bot against Twitter."
+    client = twitter.Client(bot_name)
     click.echo("auth")
 
 @cli.command()
@@ -61,15 +62,27 @@ def reset():
     click.echo("reset")
 
 @cli.command()
+@click.option("--latest-tweets", is_flag=True,
+    help="Train from latest tweets.")
 @click.option("--csv-archive",
     help="Train from Twitter CSV tweet archive.")
 @click.argument("bot_name")
-def train(bot_name, csv_archive):
+def train(bot_name, latest_tweets, csv_archive):
     "Train a bot from source material."
     bot = mimicbot.Bot(bot_name)
-    bot.generator.train_csv(csv_archive)
+    if latest_tweets:
+        client = twitter.Client(bot_name)
+        tweets = client.get_latest_tweets()
+        bot.generator.train_latest_tweets(tweets)
+    if csv_archive:
+        bot.generator.train_csv(csv_archive)
+    # TODO error out if both are missing
 
 @cli.command()
+@click.option("--context-length", default=1,
+    help="Set context from INTTEGER last tweets.")
+@click.option("--manual-context",
+    help="Set context as TEXT.")
 @click.option("--random-exit", default=0,
     help="Randomly exit instead of running. 1/INTEGER chance of succeeding.")
 @click.option("--random-delay", is_flag=True,
@@ -77,7 +90,7 @@ def train(bot_name, csv_archive):
 @click.option("--dry-run", is_flag=True,
     help="Dry run. Do not post.")
 @click.argument("bot_name")
-def run(bot_name, random_exit, random_delay, dry_run):
+def run(bot_name, context_length, manual_context, random_exit, random_delay, dry_run):
     "Run a bot."
     if random_exit:
         roll = random.randint(1, random_exit)
@@ -86,7 +99,8 @@ def run(bot_name, random_exit, random_delay, dry_run):
             return
     click.secho("Getting text...", fg="green")
     bot = mimicbot.Bot(bot_name)
-    text = bot.get_text()
+    # TODO move the twitter client stuff into the bot
+    text = bot.get_text(manual_context)
     click.secho("Got text...", fg="green")
     click.echo("%s" % text)
     if random_delay:
@@ -97,5 +111,5 @@ def run(bot_name, random_exit, random_delay, dry_run):
         click.secho("Dry run. Exiting...", fg="green")
     else:
         click.secho("Posting...", fg="green")
-        client = twitter.Client(name)
+        client = twitter.Client(bot_name)
         client.post(text)

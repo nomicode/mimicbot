@@ -4,9 +4,12 @@ import re
 import csv
 import html
 
+import dateutil
+from dateutil import parser
+
 from MarkovText import MarkovText
 
-from whoosh import fields, index, qparser
+from whoosh import fields, index, qparser, analysis
 
 class MarkovGenerator:
 
@@ -20,7 +23,12 @@ class MarkovGenerator:
         self.dir = dir
 
     def get_index(self):
-        schema = fields.Schema(content=fields.TEXT)
+        stem_ana = analysis.StemmingAnalyzer()
+        schema = fields.Schema(
+            id=fields.ID(unique=True),
+            datetime=fields.DATETIME,
+            text=fields.TEXT(analyzer=stem_ana, stored=True)
+        )
         index_dir = os.path.join(self.dir, "index")
         if os.path.exists(index_dir):
             self.index = index.open_dir(index_dir)
@@ -28,37 +36,65 @@ class MarkovGenerator:
             os.mkdir(index_dir)
             self.index = index.create_in(index_dir, schema)
 
-    def search(self):
+    def search(self, query):
         self.get_index()
+
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4, depth=9)
+
+
         with self.index.searcher() as searcher:
-            print("hi")
-            parser = qparser.QueryParser("content", self.index.schema)
-            query = parser.parse("*")
+            # improve relevance! form query from keywords
+            keywords = searcher.key_terms_from_text("text", query)
+            keyword_query = " ".join(
+                [keyword for keyword, score in keywords])
+
+            print("keyword query: %s" % keyword_query)
+
+            parser = qparser.QueryParser(
+                "text", self.index.schema, group=qparser.OrGroup)
+            query = parser.parse(keyword_query)
             results = searcher.search(query, limit=100)
             for result in results:
-                print(result)
+                yield result["text"]
 
     def read_csv(self, filename):
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4, depth=9)
+
         with open(filename, "r") as csv_file:
             reader = csv.reader(csv_file, delimiter=",", quotechar="\"")
             for row in reader:
+                if row[0] == "tweet_id":
+                    # skip header row
+                    continue
+                id = row[0]
+                datetime = dt = dateutil.parser.parse(row[3])
                 text = html.unescape(row[5])
-                yield text
+                yield id, datetime, text
 
     def train_csv(self, filename):
         self.get_index()
         writer = self.index.writer()
-        for text in self.read_csv(filename):
-            writer.add_document(content=text)
+        for id, datetime, text in self.read_csv(filename):
+            print("writing doc: %s, %s, %s" % (id, datetime, text))
+            writer.update_document(id=id, datetime=datetime, text=text)
         writer.commit()
+        doc_count = self.index.doc_count()
+        print("doc count: %s" % doc_count)
 
-    def run(self):
-        print("foo")
-        self.search()
-        return
+    def train_latest_tweets(self, tweets):
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4, depth=9)
+        pp.pprint(tweets)
+
+    def run(self, manual_context):
+        print("run")
+        results = list(self.search(manual_context))
+        print("got %s results" % len(results))
         self.chain = MarkovText.Markov()
-        filename = os.path.expanduser("~/.mimicbot/%s/tweets.txt" % name)
-        self.chain.add_to_dict(open(filename).read())
+        for result in results:
+            self.chain.add_to_dict(result)
         sentence_count = random.randint(1, 6)
         return self.chain.create_sentences(sentence_count)
 

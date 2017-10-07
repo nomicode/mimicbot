@@ -28,10 +28,10 @@ class Bot:
         # print("filter passed")
         return self.processor.run(text)
 
-    def get_text(self):
+    def get_text(self, manual_prime):
         text = None
         for i in range(100000):
-            text = self.generator.run()
+            text = self.generator.run(manual_prime)
             # print("\ngenerated: %s" % text)
             try:
                 return self._handle(text)
