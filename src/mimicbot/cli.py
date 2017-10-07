@@ -1,6 +1,10 @@
+import os
 import sys
 import random
 import time
+import shutil
+
+from os.path import expanduser
 
 import click
 
@@ -13,21 +17,38 @@ def cli():
 
 @cli.command()
 @click.argument("bot_name")
-def create():
+def create(bot_name):
     "Create a bot."
-    click.echo("create")
+    home = expanduser("~")
+    bot_dir = os.path.join(home, ".mimicbot", bot_name)
+    if not os.path.isdir(bot_dir):
+        click.secho("Creating bot...", fg="green")
+        os.makedirs(bot_dir)
+        click.secho("Done!", fg="green")
+    else:
+        click.secho("Bot exists!", fg="red")
 
 @cli.command()
-@click.argument("bot_name")
 def list():
     "List bots."
-    click.echo("list")
+    home = expanduser("~")
+    bots_dir = os.path.join(home, ".mimicbot")
+    for filename in os.listdir(bots_dir):
+        if os.path.isdir(os.path.join(bots_dir, filename)):
+            click.echo(filename)
 
 @cli.command()
 @click.argument("bot_name")
-def delete():
+def delete(bot_name):
     "Delete a bot."
-    click.echo("delete")
+    home = expanduser("~")
+    bot_dir = os.path.join(home, ".mimicbot", bot_name)
+    if os.path.isdir(bot_dir):
+        click.secho("Deleting bot...", fg="green")
+        shutil.rmtree(bot_dir)
+        click.secho("Done!", fg="green")
+    else:
+        click.secho("Not a bot!", fg="red")
 
 @cli.command()
 @click.argument("bot_name")
