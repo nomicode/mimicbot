@@ -24,5 +24,10 @@ class Client():
         self.twitter = twitter.Twitter(auth=twitter.OAuth(
             oauth_token, oauth_secret, consumer_key, consumer_secret))
 
+    def get_latest_tweets(self, username):
+        tweets = self.twitter.statuses.user_timeline(
+            screen_name=username, count=200)
+        return tweets
+
     def post(self, text):
         self.twitter.statuses.update(status=text)

@@ -62,9 +62,9 @@ def reset():
     click.echo("reset")
 
 @cli.command()
-@click.option("--latest-tweets", is_flag=True,
-    help="Train from latest tweets.")
-@click.option("--csv-archive",
+@click.option("--latest-tweets", metavar="USERNAME",
+    help="Train from a user's latest tweets.")
+@click.option("--csv-archive", metavar="FILENAME",
     help="Train from Twitter CSV tweet archive.")
 @click.argument("bot_name")
 def train(bot_name, latest_tweets, csv_archive):
@@ -72,15 +72,21 @@ def train(bot_name, latest_tweets, csv_archive):
     bot = mimicbot.Bot(bot_name)
     if latest_tweets:
         client = twitter.Client(bot_name)
-        tweets = client.get_latest_tweets()
+        tweets = client.get_latest_tweets(latest_tweets)
         bot.generator.train_latest_tweets(tweets)
     if csv_archive:
         bot.generator.train_csv(csv_archive)
     # TODO error out if both are missing
+    # TODO add option for just reading lines from a file. for when someone is
+    # running a bot based off of someone else's account. given that our "latest
+    # tweets" only grabs the last 200 each time
 
 @cli.command()
-@click.option("--context-length", default=1,
-    help="Set context from INTTEGER last tweets.")
+# TODO make username a config ini setting
+@click.option("--train", metavar="USERNAME",
+    help="Train the bot from recent tweets before running.")
+@click.option("--use-context", is_flag=True,
+    help="Set context from LENGTH recent tweets.")
 @click.option("--manual-context",
     help="Set context as TEXT.")
 @click.option("--random-exit", default=0,
@@ -90,17 +96,22 @@ def train(bot_name, latest_tweets, csv_archive):
 @click.option("--dry-run", is_flag=True,
     help="Dry run. Do not post.")
 @click.argument("bot_name")
-def run(bot_name, context_length, manual_context, random_exit, random_delay, dry_run):
+def run(bot_name, train, use_context, manual_context, random_exit, random_delay, dry_run):
     "Run a bot."
+    bot = mimicbot.Bot(bot_name)
+    if train:
+        # TODO: remove duplication from command above
+        client = twitter.Client(bot_name)
+        tweets = client.get_latest_tweets(train)
+        bot.generator.train_latest_tweets(tweets)
     if random_exit:
         roll = random.randint(1, random_exit)
         if roll != 1:
             click.secho("Randomly exiting!", fg="green")
             return
     click.secho("Getting text...", fg="green")
-    bot = mimicbot.Bot(bot_name)
     # TODO move the twitter client stuff into the bot
-    text = bot.get_text(manual_context)
+    text = bot.get_text(use_context, manual_context)
     click.secho("Got text...", fg="green")
     click.echo("%s" % text)
     if random_delay:

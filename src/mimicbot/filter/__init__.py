@@ -13,7 +13,8 @@ class Filter:
             raise Exception("too long")
 
     def check_contains_link(self, text):
-        if re.findall("http(s?)://", text):
+        # update tests for only using ":"
+        if re.findall("http(s?):", text):
             raise Exception("contains link")
 
     def check_contains_username(self, text):
