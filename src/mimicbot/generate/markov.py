@@ -177,6 +177,9 @@ class MarkovGenerator:
         results = list(self.search("%NEWLINE%"))
         # BIG TODO: EXPAND CONTEXT SEARCH SO WE AIM FOR X RESULTS
         # BIG TODO: (let's say 100)
+        # BIG TODO: add this in ini file
+        # BIG TODO: do this by expanding number of keywords generated from
+        # BIG TODO context, until result size is good enough
         click.secho("Got %s tweets!" % len(results), fg="green")
         self.chain = MarkovText.Markov()
         for result in results:
