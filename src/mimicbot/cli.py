@@ -106,6 +106,10 @@ def run(bot_name, train, use_context, manual_context, random_exit, random_delay,
         if roll != 1:
             click.secho("Randomly exiting!", fg="green")
             return
+    if random_delay:
+        seconds = random.randint(1, int(random_delay))
+        click.secho("Sleeping for %ss..." % seconds, fg="green")
+        time.sleep(seconds)
     bot = mimicbot.Bot(bot_name)
     if train:
         # TODO: remove duplication from command above
@@ -117,10 +121,6 @@ def run(bot_name, train, use_context, manual_context, random_exit, random_delay,
     text = bot.get_text(use_context, manual_context)
     click.secho("Got text...", fg="green")
     click.echo("%s" % text)
-    if random_delay:
-        seconds = random.randint(1, random_delay)
-        click.secho("Sleeping for %ss..." % seconds, fg="green")
-        time.sleep(seconds)
     if dry_run:
         click.secho("Dry run. Exiting...", fg="green")
     else:
