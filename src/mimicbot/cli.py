@@ -84,6 +84,8 @@ def train(bot_name, latest_tweets, csv_archive):
 
 @cli.command()
 # TODO make username a config ini setting
+# TODO add help docs saying that "not authorized" can be thrown if the training
+# TODO account is locked
 @click.option("--train", metavar="USERNAME",
     help="Train the bot from recent tweets before running.")
 @click.option("--use-context", is_flag=True,
@@ -92,7 +94,7 @@ def train(bot_name, latest_tweets, csv_archive):
     help="Set context as TEXT.")
 @click.option("--random-exit", default=0,
     help="Randomly exit instead of running. 1/INTEGER chance of succeeding.")
-@click.option("--random-delay", is_flag=True,
+@click.option("--random-delay", metavar="SECONDS",
     help="Run with a random delay.")
 @click.option("--dry-run", is_flag=True,
     help="Dry run. Do not post.")
@@ -116,7 +118,7 @@ def run(bot_name, train, use_context, manual_context, random_exit, random_delay,
     click.secho("Got text...", fg="green")
     click.echo("%s" % text)
     if random_delay:
-        seconds = random.randint(1, 60)
+        seconds = random.randint(1, random_delay)
         click.secho("Sleeping for %ss..." % seconds, fg="green")
         time.sleep(seconds)
     if dry_run:
