@@ -41,6 +41,8 @@ setuptools.setup(
       "MarkovText",
       "twitter",
       "pyparsing",
-      "click"
+      "click",
+      "Whoosh",
+      "python-dateutil",
     ]
 )
