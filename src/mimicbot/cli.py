@@ -101,17 +101,17 @@ def train(bot_name, latest_tweets, csv_archive):
 @click.argument("bot_name")
 def run(bot_name, train, use_context, manual_context, random_exit, random_delay, dry_run):
     "Run a bot."
+    if random_exit:
+        roll = random.randint(1, random_exit)
+        if roll != 1:
+            click.secho("Randomly exiting!", fg="green")
+            return
     bot = mimicbot.Bot(bot_name)
     if train:
         # TODO: remove duplication from command above
         client = twitter.Client(bot_name)
         tweets = client.get_latest_tweets(train)
         bot.generator.train_latest_tweets(tweets)
-    if random_exit:
-        roll = random.randint(1, random_exit)
-        if roll != 1:
-            click.secho("Randomly exiting!", fg="green")
-            return
     click.secho("Getting text...", fg="green")
     # TODO move the twitter client stuff into the bot
     text = bot.get_text(use_context, manual_context)
