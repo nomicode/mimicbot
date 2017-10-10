@@ -173,8 +173,11 @@ class MarkovGenerator:
             context = self.get_context()
         if manual_context:
             context = manual_context
+        if not context:
+            # TODO: better way of doing this
+            context = "*"
         click.secho("Getting tweets for markov chain...", fg="green")
-        results = list(self.search("%NEWLINE%"))
+        results = list(self.search(context))
         # BIG TODO: EXPAND CONTEXT SEARCH SO WE AIM FOR X RESULTS
         # BIG TODO: (let's say 100)
         # BIG TODO: add this in ini file
