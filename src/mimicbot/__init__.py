@@ -2,7 +2,7 @@ import os
 
 from mimicbot import filter, generate, process
 
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 
 class Bot:
 
