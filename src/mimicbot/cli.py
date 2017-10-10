@@ -52,6 +52,7 @@ def delete(bot_name):
 @click.argument("bot_name")
 def auth(bot_name):
     "Authenticate a bot against Twitter."
+    # TODO: before doing this, wipe the existing auth file to force re-auth
     client = twitter.Client(bot_name)
     click.echo("auth")
 
