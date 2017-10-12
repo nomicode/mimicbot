@@ -1,6 +1,5 @@
 nose2
 language_check
-MarkovText
 nose-parameterized
 pyparsing
 twitter
@@ -10,3 +9,4 @@ twine
 click
 Whoosh
 python-dateutil
+markovify

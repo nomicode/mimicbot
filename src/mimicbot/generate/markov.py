@@ -7,7 +7,7 @@ import html
 import dateutil
 from dateutil import parser
 
-from MarkovText import MarkovText
+import markovify
 
 # TODO: don't use them like this
 from whoosh import fields, index, qparser, analysis, sorting
@@ -215,11 +215,16 @@ class MarkovGenerator:
     def run(self, use_context, manual_context):
         if not self.results:
             self.get_results(use_context, manual_context)
-        self.chain = MarkovText.Markov()
-        for result in self.results:
-            self.chain.add_to_dict(result)
-        sentence_count = random.randint(1, 6)
-        output = self.chain.create_sentences(sentence_count)
+        text = "\n".join(self.results)
+        self.chain = markovify.NewlineText(text)
+        # TODO make this configurable
+        # sentence_count = random.randint(1, 6)
+        # TODO add max_overlap_ratio and max_overlap_total to config ini
+        # TODO implement back off algo. so try strict testing at first, and
+        # then rerun with looser tests if we can't find matches
+        output = self.chain.make_sentence(tries=100)
+        if not output:
+            return ""
         output = re.sub(r"\s?%NEWLINE%\s?", "\n", output)
         return output
 
