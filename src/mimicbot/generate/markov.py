@@ -18,6 +18,12 @@ import click
 import pprint
 pp = pprint.PrettyPrinter(indent=4, depth=9)
 
+MIN_KEYWORD_NUMBER=1
+MAX_KEYWORD_NUMBER=20
+
+MIN_TWEETS_NUMBER=100
+MAX_TWEETS_NUMBER=200
+
 class MarkovGenerator:
 
     dir = None
@@ -49,7 +55,7 @@ class MarkovGenerator:
             os.mkdir(index_dir)
             self.index = index.create_in(index_dir, schema)
 
-    def search(self, query):
+    def search(self, query, number):
         self.get_index()
 
         import pprint
@@ -57,7 +63,7 @@ class MarkovGenerator:
 
         with self.index.searcher() as searcher:
             # improve relevance! form query from keywords
-            keywords = searcher.key_terms_from_text("text", query, numterms=20)
+            keywords = searcher.key_terms_from_text("text", query, numterms=number)
             keyword_query = " ".join(
                 [keyword for keyword, score in keywords])
 
@@ -75,11 +81,11 @@ class MarkovGenerator:
 
             restrict_retweets = whoosh.query.Term("retweet", True)
 
-            results = searcher.search(query, mask=restrict_retweets, limit=100)
+            results = searcher.search(query, mask=restrict_retweets, limit=MAX_TWEETS_NUMBER)
             for result in results:
                 yield result["text"]
 
-    def get_context(self, number=5):
+    def get_context(self):
         if self.context:
             return self.context
 
@@ -95,7 +101,7 @@ class MarkovGenerator:
         restrict_replies = whoosh.query.Term("reply", True)
 
         results = searcher.search(
-            query, mask=restrict_replies, sortedby=datetimes, limit=number)
+            query, mask=restrict_replies, sortedby=datetimes, limit=MAX_TWEETS_NUMBER)
 
         click.secho("Adding to context...", fg="green")
 
@@ -173,7 +179,7 @@ class MarkovGenerator:
         print("doc count: %s" % doc_count)
 
 
-    def get_context(self, use_context, manual_context):
+    def get_diff_context(self, use_context, manual_context):
         context = ""
         if use_context:
             click.secho("Searching for context tweets...", fg="green")
@@ -182,7 +188,7 @@ class MarkovGenerator:
             context = manual_context
         return context
 
-    def get_results(self, use_context, manual_context):
+    def get_results(self, use_context, manual_context, number=MIN_KEYWORD_NUMBER):
 
         # TODO needs to progressively search if we're not turning up enough
         # results
@@ -192,10 +198,27 @@ class MarkovGenerator:
         # BIG TODO: do this by expanding number of keywords generated from
         # BIG TODO context, until result size is good enough
 
-        context = self.get_context(use_context, manual_context)
-        click.secho("Getting tweets for markov chain...", fg="green")
-        self.results = list(self.search(context))
-        click.secho("Got %s tweets!" % len(self.results), fg="green")
+        context = self.get_diff_context(use_context, manual_context)
+        click.secho("Getting tweets for markov chain using %s keywords..." % number, fg="green")
+        results = list(self.search(context, number))
+
+        results_count = len(results)
+
+        # TODO make this config var
+        if results_count >= MIN_TWEETS_NUMBER:
+            click.secho("Got %s tweets!" % results_count, fg="green")
+            self.results = results
+            return
+        else:
+            click.secho("Only got %s tweets! Widening the net..." % results_count, fg="red")
+
+            if number < MAX_KEYWORD_NUMBER:
+                # increment number and recurse
+                number +=1
+                self.get_results(use_context, manual_context, number)
+            else:
+                click.secho("Hit max keyword number. Switching to contextless...", fg="red")
+                self.get_results(False, "*")
 
     def run(self, use_context, manual_context):
         if not self.results:
