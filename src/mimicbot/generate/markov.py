@@ -190,14 +190,6 @@ class MarkovGenerator:
 
     def get_results(self, use_context, manual_context, number=MIN_KEYWORD_NUMBER):
 
-        # TODO needs to progressively search if we're not turning up enough
-        # results
-        # BIG TODO: EXPAND CONTEXT SEARCH SO WE AIM FOR X RESULTS
-        # BIG TODO: (let's say 100)
-        # BIG TODO: add this in ini file
-        # BIG TODO: do this by expanding number of keywords generated from
-        # BIG TODO context, until result size is good enough
-
         context = self.get_diff_context(use_context, manual_context)
         click.secho("Getting tweets for markov chain using %s keywords..." % number, fg="green")
         results = list(self.search(context, number))
