@@ -28,6 +28,8 @@ class MarkovGenerator:
 
     context = None
 
+    results = None
+
     def __init__(self, dir):
         self.dir = dir
 
@@ -58,6 +60,12 @@ class MarkovGenerator:
             keywords = searcher.key_terms_from_text("text", query, numterms=20)
             keyword_query = " ".join(
                 [keyword for keyword, score in keywords])
+
+            # if we don't find any keywords. for example, we're not actually
+            # looking up context tweets
+            # TODO find better way of doing this
+            if not keyword_query:
+                keyword_query = "*"
 
             print("keyword query: %s" % keyword_query)
 
@@ -164,28 +172,36 @@ class MarkovGenerator:
         doc_count = self.index.doc_count()
         print("doc count: %s" % doc_count)
 
-    def run(self, use_context, manual_context):
-        # TODO needs to progressively search if we're not turning up enough
-        # results
+
+    def get_context(self, use_context, manual_context):
         context = ""
         if use_context:
             click.secho("Searching for context tweets...", fg="green")
             context = self.get_context()
         if manual_context:
             context = manual_context
-        if not context:
-            # TODO: better way of doing this
-            context = "*"
-        click.secho("Getting tweets for markov chain...", fg="green")
-        results = list(self.search(context))
+        return context
+
+    def get_results(self, use_context, manual_context):
+
+        # TODO needs to progressively search if we're not turning up enough
+        # results
         # BIG TODO: EXPAND CONTEXT SEARCH SO WE AIM FOR X RESULTS
         # BIG TODO: (let's say 100)
         # BIG TODO: add this in ini file
         # BIG TODO: do this by expanding number of keywords generated from
         # BIG TODO context, until result size is good enough
-        click.secho("Got %s tweets!" % len(results), fg="green")
+
+        context = self.get_context(use_context, manual_context)
+        click.secho("Getting tweets for markov chain...", fg="green")
+        self.results = list(self.search(context))
+        click.secho("Got %s tweets!" % len(self.results), fg="green")
+
+    def run(self, use_context, manual_context):
+        if not self.results:
+            self.get_results(use_context, manual_context)
         self.chain = MarkovText.Markov()
-        for result in results:
+        for result in self.results:
             self.chain.add_to_dict(result)
         sentence_count = random.randint(1, 6)
         output = self.chain.create_sentences(sentence_count)
