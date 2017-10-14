@@ -10,3 +10,4 @@ click
 Whoosh
 python-dateutil
 markovify
+asteval

@@ -77,8 +77,7 @@ def train(bot_name, latest_tweets, csv_archive):
     "Train a bot from source material."
     bot = mimicbot.Bot(bot_name)
     if latest_tweets:
-        client = twitter.Client(bot_name)
-        tweets = client.get_latest_tweets(latest_tweets)
+        tweets = bot.client.get_latest_tweets(latest_tweets)
         bot.generator.train_latest_tweets(tweets)
     if csv_archive:
         bot.generator.train_csv(csv_archive)
@@ -118,8 +117,7 @@ def run(bot_name, train, use_context, manual_context, random_exit, random_delay,
     bot = mimicbot.Bot(bot_name)
     if train:
         # TODO: remove duplication from command above
-        client = twitter.Client(bot_name)
-        tweets = client.get_latest_tweets(train)
+        tweets = bot.client.get_latest_tweets(train)
         bot.generator.train_latest_tweets(tweets)
     click.secho("Getting text...", fg="green")
     # TODO move the twitter client stuff into the bot
@@ -130,5 +128,4 @@ def run(bot_name, train, use_context, manual_context, random_exit, random_delay,
         click.secho("Dry run. Exiting...", fg="green")
     else:
         click.secho("Posting...", fg="green")
-        client = twitter.Client(bot_name)
-        client.post(text)
+        bot.client.post(text)

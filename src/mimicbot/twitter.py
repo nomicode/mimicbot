@@ -4,14 +4,18 @@ import twitter
 
 class Client():
 
+    config = None
+
     username = None
 
     twitter = None
 
-    def __init__(self, name):
+    def __init__(self, config, name):
 
         # this is bad. move it to the ini
         self.username = name
+
+        self.config = config
 
         # load Twitter app consumer details
         # TODO: move this to ini file
@@ -37,16 +41,29 @@ class Client():
 
     def post(self, text):
 
-        # randomly reply to last tweet
-        tweets = self.twitter.statuses.user_timeline(
-            screen_name=self.username, count=1)
-        last_tweet_id = tweets[0]["id"]
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4, depth=9)
+
+        odds = self.config.get(
+            "behaviour", "reply_to_last_tweet_odds", fallback="0")
+
+        import asteval
+        from asteval import Interpreter
+        aeval = Interpreter()
+
+        odds = aeval(odds)
+        pp.pprint(odds)
 
         import random
 
-        # todo move this to config variable
-        if random.randint(1,8) == 1:
+        if random.random() < odds:
+            print("replying to last tweet")
+            # randomly reply to last tweet
+            tweets = self.twitter.statuses.user_timeline(
+                screen_name=self.username, count=1)
+            last_tweet_id = tweets[0]["id"]
             self.twitter.statuses.update(
                 status=text, in_reply_to_status_id=last_tweet_id)
         else:
+            print("not replying to last tweet")
             self.twitter.statuses.update(status=text)

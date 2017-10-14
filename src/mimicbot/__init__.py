@@ -21,6 +21,8 @@ class Bot:
 
     processor = None
 
+    client = None
+
     def __init__(self, name):
         home = os.path.expanduser("~")
         self.dir = os.path.join(home, ".mimicbot", name)
@@ -36,6 +38,8 @@ class Bot:
         self.generator = generate.Generator(self.dir)
         self.filter = filter.Filter()
         self.processor = process.Processor()
+
+        self.client = twitter.Client(self.config, name)
 
     def _handle(self, text):
         self.filter.run(text)

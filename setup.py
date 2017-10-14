@@ -46,5 +46,6 @@ setuptools.setup(
       "click",
       "Whoosh",
       "python-dateutil",
+      "asteval"
     ]
 )
