@@ -1,12 +1,19 @@
 import os
 
+import configparser
+
 from mimicbot import filter, generate, process
+
+import pprint
+pp = pprint.PrettyPrinter(indent=4, depth=9)
 
 __version__ = "0.0.13"
 
 class Bot:
 
     dir = None
+
+    config = None
 
     generator = None
 
@@ -19,6 +26,13 @@ class Bot:
         self.dir = os.path.join(home, ".mimicbot", name)
         if not os.path.isdir(self.dir):
             raise Exception("bot dir does not exist")
+
+        self.config = configparser.ConfigParser()
+        self.config.read(os.path.join(self.dir, "config.ini"))
+
+        print("config")
+        pp.pprint(self.config.sections())
+
         self.generator = generate.Generator(self.dir)
         self.filter = filter.Filter()
         self.processor = process.Processor()
