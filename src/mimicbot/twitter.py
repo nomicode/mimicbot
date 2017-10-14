@@ -4,9 +4,15 @@ import twitter
 
 class Client():
 
+    username = None
+
     twitter = None
 
     def __init__(self, name):
+
+        # this is bad. move it to the ini
+        self.username = name
+
         # load Twitter app consumer details
         # TODO: move this to ini file
         consumer_file = os.path.expanduser("~/.mimicbot/%s/consumer" % name)
@@ -30,4 +36,17 @@ class Client():
         return tweets
 
     def post(self, text):
-        self.twitter.statuses.update(status=text)
+
+        # randomly reply to last tweet
+        tweets = self.twitter.statuses.user_timeline(
+            screen_name=self.username, count=1)
+        last_tweet_id = tweets[0]["id"]
+
+        import random
+
+        # todo move this to config variable
+        if random.randint(1,8) == 1:
+            self.twitter.statuses.update(
+                status=text, in_reply_to_status_id=last_tweet_id)
+        else:
+            self.twitter.statuses.update(status=text)
