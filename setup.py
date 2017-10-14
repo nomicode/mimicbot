@@ -32,6 +32,8 @@ setuptools.setup(
     license="Apache License 2.0",
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
+    package_data={"": ["data/*"]},
+
     entry_points = {
         "console_scripts": ["mimicbot=mimicbot.cli:cli"],
     },

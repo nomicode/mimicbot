@@ -23,6 +23,11 @@ def create(bot_name):
         click.secho("Creating bot...", fg="green")
         os.makedirs(bot_dir)
         click.secho("Done!", fg="green")
+
+        this_dir, this_filename = os.path.split(__file__)
+        config_filename = os.path.join(this_dir, "data", "config.ini")
+        shutil.copy(config_filename, os.path.join(bot_dir, "config.ini"))
+
     else:
         click.secho("Bot exists!", fg="red")
 
