@@ -18,7 +18,7 @@ import click
 import pprint
 pp = pprint.PrettyPrinter(indent=4, depth=9)
 
-MIN_KEYWORD_NUMBER=1
+MIN_KEYWORD_NUMBER=2
 MAX_KEYWORD_NUMBER=20
 
 MIN_TWEETS_NUMBER=100
