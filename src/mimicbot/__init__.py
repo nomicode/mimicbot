@@ -7,7 +7,7 @@ from mimicbot import filter, generate, process
 import pprint
 pp = pprint.PrettyPrinter(indent=4, depth=9)
 
-__version__ = "0.0.14"
+__version__ = "0.0.15"
 
 class Bot:
 
