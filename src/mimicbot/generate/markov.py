@@ -18,11 +18,13 @@ import click
 import pprint
 pp = pprint.PrettyPrinter(indent=4, depth=9)
 
-MIN_KEYWORD_NUMBER=2
+MIN_KEYWORD_NUMBER=1
 MAX_KEYWORD_NUMBER=20
 
 MIN_TWEETS_NUMBER=100
 MAX_TWEETS_NUMBER=200
+
+CONTEXT_SIZE=3
 
 class MarkovGenerator:
 
@@ -101,7 +103,7 @@ class MarkovGenerator:
         restrict_replies = whoosh.query.Term("reply", True)
 
         results = searcher.search(
-            query, mask=restrict_replies, sortedby=datetimes, limit=MAX_TWEETS_NUMBER)
+            query, mask=restrict_replies, sortedby=datetimes, limit=CONTEXT_SIZE)
 
         click.secho("Adding to context...", fg="green")
 
