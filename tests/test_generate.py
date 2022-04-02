@@ -12,6 +12,6 @@ class TestGenerate(unittest.TestCase):
 
     def test_output_length(self):
         # simplistic
-        for i in range(100):
+        for _ in range(100):
             text = self.bot.generator.run()
             self.assertTrue(len(text) > 0)

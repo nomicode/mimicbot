@@ -19,11 +19,11 @@ class Client():
 
         # load Twitter app consumer details
         # TODO: move this to ini file
-        consumer_file = os.path.expanduser("~/.mimicbot/%s/consumer" % name)
+        consumer_file = os.path.expanduser(f"~/.mimicbot/{name}/consumer")
         consumer_key, consumer_secret = twitter.read_token_file(consumer_file)
 
         # load authentication
-        auth_file = os.path.expanduser("~/.mimicbot/%s/auth" % name)
+        auth_file = os.path.expanduser(f"~/.mimicbot/{name}/auth")
         if not os.path.exists(auth_file):
             # none exist, so get authentication details
             twitter.oauth_dance(
@@ -35,9 +35,7 @@ class Client():
             oauth_token, oauth_secret, consumer_key, consumer_secret))
 
     def get_latest_tweets(self, username):
-        tweets = self.twitter.statuses.user_timeline(
-            screen_name=username, count=200)
-        return tweets
+        return self.twitter.statuses.user_timeline(screen_name=username, count=200)
 
     def post(self, text):
 

@@ -73,7 +73,7 @@ class MarkovGenerator:
             if not keyword_query:
                 keyword_query = "*"
 
-            print("keyword query: %s" % keyword_query)
+            print(f"keyword query: {keyword_query}")
 
             parser = qparser.QueryParser(
                 "text", self.index.schema, group=qparser.OrGroup)
@@ -143,8 +143,8 @@ class MarkovGenerator:
                     continue
                 id = row[0]
                 datetime = dateutil.parser.parse(row[3])
-                reply = True if row[1] else False
-                retweet = True if row[6] else False
+                reply = bool(row[1])
+                retweet = bool(row[6])
                 text = html.unescape(row[5])
                 # turn newlines into something a markov chain is aware of
                 text = re.sub(r"\n", " %NEWLINE% ", text)
@@ -154,11 +154,11 @@ class MarkovGenerator:
         self.get_index()
         writer = self.index.writer()
         for id, datetime, reply, retweet, text in self.read_csv(filename):
-            print("writing doc: %s, %s, %s, %s, %s" % (id, datetime, reply, retweet, text))
+            print(f"writing doc: {id}, {datetime}, {reply}, {retweet}, {text}")
             writer.update_document(id=id, datetime=datetime, reply=reply, retweet=retweet, text=text)
         writer.commit()
         doc_count = self.index.doc_count()
-        print("doc count: %s" % doc_count)
+        print(f"doc count: {doc_count}")
 
     def train_latest_tweets(self, tweets):
         # TODO: fix duplication with train_csv method
@@ -167,16 +167,16 @@ class MarkovGenerator:
         for tweet in tweets:
             id = tweet["id_str"]
             datetime = dateutil.parser.parse(tweet["created_at"])
-            reply = True if tweet["in_reply_to_status_id"] else False
-            retweet = True if tweet["retweeted"] else False
+            reply = bool(tweet["in_reply_to_status_id"])
+            retweet = bool(tweet["retweeted"])
             text = html.unescape(tweet["text"])
             # turn newlines into something a markov chain is aware of
             text = re.sub(r"\n", " %NEWLINE% ", text)
-            print("writing doc: %s, %s, %s, %s, %s" % (id, datetime, reply, retweet, text))
+            print(f"writing doc: {id}, {datetime}, {reply}, {retweet}, {text}")
             writer.update_document(id=id, datetime=datetime, reply=reply, retweet=retweet, text=text)
         writer.commit()
         doc_count = self.index.doc_count()
-        print("doc count: %s" % doc_count)
+        print(f"doc count: {doc_count}")
 
 
     def get_diff_context(self, use_context, manual_context):
@@ -191,18 +191,22 @@ class MarkovGenerator:
     def get_results(self, use_context, manual_context, number=MIN_KEYWORD_NUMBER):
 
         context = self.get_diff_context(use_context, manual_context)
-        click.secho("Getting tweets for markov chain using %s keywords..." % number, fg="green")
+        click.secho(
+            f"Getting tweets for markov chain using {number} keywords...",
+            fg="green",
+        )
+
         results = list(self.search(context, number))
 
         results_count = len(results)
 
         # TODO make this config var
         if results_count >= MIN_TWEETS_NUMBER:
-            click.secho("Got %s tweets!" % results_count, fg="green")
+            click.secho(f"Got {results_count} tweets!", fg="green")
             self.results = results
             return
         else:
-            click.secho("Only got %s tweets! Widening the net..." % results_count, fg="red")
+            click.secho(f"Only got {results_count} tweets! Widening the net...", fg="red")
 
             if number < MAX_KEYWORD_NUMBER:
                 # increment number and recurse
