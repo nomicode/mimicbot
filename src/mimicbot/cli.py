@@ -87,9 +87,6 @@ def train(bot_name, latest_tweets, csv_archive):
     # tweets" only grabs the last 200 each time
 
 @cli.command()
-# TODO make username a config ini setting
-# TODO add help docs saying that "not authorized" can be thrown if the training
-# TODO account is locked
 @click.option("--train", metavar="USERNAME",
     help="Train the bot from recent tweets before running.")
 @click.option("--use-context", is_flag=True,
@@ -112,7 +109,7 @@ def run(bot_name, train, use_context, manual_context, random_exit, random_delay,
             return
     if random_delay:
         seconds = random.randint(1, int(random_delay))
-        click.secho("Sleeping for %ss..." % seconds, fg="green")
+        click.secho(f"Sleeping for {seconds}s...", fg="green")
         time.sleep(seconds)
     bot = mimicbot.Bot(bot_name)
     if train:
@@ -123,7 +120,7 @@ def run(bot_name, train, use_context, manual_context, random_exit, random_delay,
     # TODO move the twitter client stuff into the bot
     text = bot.get_text(use_context, manual_context)
     click.secho("Got text...", fg="green")
-    click.echo("%s" % text)
+    click.echo(f"{text}")
     if dry_run:
         click.secho("Dry run. Exiting...", fg="green")
     else:

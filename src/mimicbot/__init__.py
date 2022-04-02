@@ -48,13 +48,12 @@ class Bot:
 
     def get_text(self, use_context, manual_context):
         text = None
-        for i in range(100000):
+        for _ in range(100000):
             text = self.generator.run(use_context, manual_context)
             # print("\ngenerated: %s" % text)
             try:
                 return self._handle(text)
             except Exception as error:
-                print("error: %s" % error)
-                continue
+                print(f"error: {error}")
         raise Exception("too many failed attempts to filter text")
 
